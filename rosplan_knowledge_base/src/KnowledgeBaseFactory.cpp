@@ -15,5 +15,6 @@ namespace KCL_rosplan {
             ROS_ERROR("KCL: (%s) Unknown Knowledge Base type.", ros::this_node::getName().c_str());
             ros::shutdown();
         }
+        return {};
     }
 }

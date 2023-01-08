@@ -180,39 +180,6 @@ namespace KCL_rosplan {
         }
     }
 
-    std::string PDDLKnowledgeBase::transform_problem(const std::string& problem_file_path) const {
-        std::ifstream in(problem_file_path, std::ios::in);
-        auto out_path = "/tmp" + problem_file_path.substr(problem_file_path.find_last_of('/'));
-        ROS_INFO("%s", out_path.c_str());
-        string content, line;
-        while (std::getline(in, line)) {
-            content += line + "\n";
-        }
-        const char* keywords[] = {
-            "(unknown", "(oneof"
-        };
-        for (const auto keyword : keywords) {
-            while (true) {
-                auto idx = content.find(keyword);
-                if (idx == std::string::npos) break;
-                int depth = 0;
-                int j = idx + 1;
-                for (int depth = 1; depth != 0; ++j) {
-                    if (content[j] == '(') ++depth;
-                    else if (content[j] == ')') --depth;
-                }
-                content = content.substr(0, idx) + content.substr(j);
-            }
-        }
-        
-        // ROS_INFO("%s", content.c_str());
-        std::ofstream out(out_path);
-        out << content;
-        out.close();
-        in.close();
-        return out_path;
-    }
-
     void PDDLKnowledgeBase::parseDomain(const std::string &domain_file_path, const std::string &problem_file_path) {
         std::ifstream file_check;
         VAL1_2::analysis* an_analysis = new VAL1_2::analysis;
@@ -248,8 +215,7 @@ namespace KCL_rosplan {
                 ROS_WARN("KCL: (%s) Initial state file does not exist.", ros::this_node::getName().c_str());
             } else {
                 file_check.close();
-                auto new_path = transform_problem(problem_file_path);
-                VAL1_2::problem* problem = problem_parser.parseProblem(new_path);
+                VAL1_2::problem* problem = problem_parser.parseProblem(problem_file_path);
                 if(problem) {
                     addInitialState();
                 } else {

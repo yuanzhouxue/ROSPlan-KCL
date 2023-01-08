@@ -10,7 +10,6 @@ namespace KCL_rosplan {
         
 		ROS_INFO("KCL: (%s) Planner output received.", ros::this_node::getName().c_str());        
 		ROS_INFO("KCL: (%s) Is plan empty?: %d", ros::this_node::getName().c_str(), plannerOutput.data.size() == 0);
-        
 		planner_output_received = true;
 		planner_output_time = ros::Time::now().toSec();
 		planner_output = plannerOutput.data;

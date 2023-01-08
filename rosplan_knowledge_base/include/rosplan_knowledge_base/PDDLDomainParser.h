@@ -37,6 +37,8 @@ namespace KCL_rosplan {
 
 		/* domain parsing */
 		VAL1_2::domain* parseDomain(const std::string domainPath);
-	};
+
+        void preprocessDomain(string &content);
+    };
 }
 #endif

@@ -37,18 +37,27 @@ namespace {
         // Example of actions of Contigent-FF:            
         //   17||0 --- FIND_OBJECT C1 ITEM_0 --- SON: 18||0
         //   18||0 --- PICKUP_OBJECT C1 ITEM_0 --- SON: 19||0
-        //
+        //   0||0 --- LOCATE BALL1 WP2 --- TRUESON: 1||0 --- FALSESON: 1||1
             
         std::vector<std::string> tokens;                
         
         split_string(line, tokens, ' ');        
-        action_id = tokens[0].substr(0, tokens[0].find("||"));
+        action_id = tokens[0];
         operator_name = tokens[2];                    
 
         int idx = 3;
         while (idx < tokens.size() && tokens[idx] != "---") {
+            if (tokens[idx] == "---") break;
             operator_params.push_back(tokens[idx]);
             idx++;
+        }
+        idx++;
+        std::string true_son, false_son;
+        if (idx == tokens.size() - 2) {
+            true_son = false_son = tokens.back();
+        } else {
+            true_son = tokens[idx + 1];
+            false_son = tokens.back();
         }
         
         ROS_DEBUG("KCL: (%s) Elements in line: { %s, %s, etc. }", ros::this_node::getName().c_str(), action_id.c_str(), operator_name.c_str());  
@@ -186,21 +195,21 @@ void CFFPlannerInterface::convertPlanToPopfFormat(std::ifstream &plan_file) {
         std::getline(plan_file, line);                    
         
         if (!line.empty()) {  
-           if (!(line.compare("-------------------------------------------------") == 0)) {
+           if (line.compare("-------------------------------------------------") != 0) {
         
-                std::vector<std::string> tokens;                
-                split_string(line, tokens, ' ');
-
-                std::string action_id;
-                std::string operator_name;                    
-                OperatorParams operator_params;                
-                extractElementsFromLine(line, action_id, operator_name, operator_params);
-                
-                std::string action; 
-                createAction(action_id, operator_name, operator_params, action);
+//                std::vector<std::string> tokens;
+//                split_string(line, tokens, ' ');
+//
+//                std::string action_id;
+//                std::string operator_name;
+//                OperatorParams operator_params;
+//                extractElementsFromLine(line, action_id, operator_name, operator_params);
+//
+//                std::string action;
+//                createAction(action_id, operator_name, operator_params, action);
         
-                planner_output += action;                
-                ROS_INFO("KCL: (%s) Action: { %s }", ros::this_node::getName().c_str(), action.c_str());   
+                planner_output += line + "\n";
+//                ROS_INFO("KCL: (%s) Action: { %s }", ros::this_node::getName().c_str(), action.c_str());
            }
         } else {
             isParseCompleted = true;
@@ -228,8 +237,8 @@ bool CFFPlannerInterface::parsePlan() {
     solved = isPlanSolved(plan_file);
     if (solved) {        
         convertPlanToPopfFormat(plan_file);
-        savePlanInPopfFormatToFile();
-    }    
+//        savePlanInPopfFormatToFile();
+    }
     plan_file.close();        
     
     return solved;

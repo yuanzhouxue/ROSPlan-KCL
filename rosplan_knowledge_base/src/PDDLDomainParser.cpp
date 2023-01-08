@@ -44,8 +44,12 @@ namespace KCL_rosplan {
 			line_no = 0;
 			VAL1_2::log_error(VAL1_2::E_FATAL,"Failed to open file");
 		} else {
+            string content, line;
+            while (getline(domainFile, line)) content += line + "\n";
+            preprocessDomain(content);
+            std::stringstream ss(content);
 			line_no = 1;
-			VAL1_2::yfl->switch_streams(&domainFile, &std::cout);
+			VAL1_2::yfl->switch_streams(&ss, &std::cout);
 			yyparse();
 
 			// domain name
@@ -58,5 +62,13 @@ namespace KCL_rosplan {
 		return domain;
 
 	}
+
+    void PDDLDomainParser::preprocessDomain(string &content) {
+        while (true) {
+            auto idx = content.find(":observe");
+            if (idx == string::npos) break;
+            content = content.replace(idx, 8, ":effect");
+        }
+    }
 
 } // close namespace

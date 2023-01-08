@@ -19,6 +19,8 @@ add_message_files(
    EsterelPlanEdge.msg
    EsterelPlanNode.msg
    CompletePlan.msg
+   CFFCompletePlan.msg
+   CFFPlanEdge.msg
    ActionDispatch.msg
    ActionFeedback.msg
 )

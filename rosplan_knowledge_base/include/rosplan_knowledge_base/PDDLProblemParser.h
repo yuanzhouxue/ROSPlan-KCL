@@ -40,6 +40,7 @@ namespace KCL_rosplan {
         VAL1_2::problem* parseProblem(const std::string ProblemPath);
 
 
+        void preprocessProblem(string &content);
     };
 }
 #endif

@@ -46,8 +46,13 @@ namespace KCL_rosplan {
             line_no = 0;
             VAL1_2::log_error(VAL1_2::E_FATAL,"Failed to open file");
         } else {
+            string content, line;
+            while (getline(ProblemFile, line)) content += line + "\n";
+            preprocessProblem(content);
+            std::stringstream ss(content);
+
             line_no = 1;
-            VAL1_2::yfl->switch_streams(&ProblemFile, &std::cout);
+            VAL1_2::yfl->switch_streams(&ss, &std::cout);
             yyparse();
 
             // Problem name
@@ -60,5 +65,23 @@ namespace KCL_rosplan {
 
         return problem;
 
+    }
+
+    void PDDLProblemParser::preprocessProblem(string &content) {
+        const char* keywords[] = {
+                "(unknown", "(oneof"
+        };
+        for (const auto keyword : keywords) {
+            while (true) {
+                auto idx = content.find(keyword);
+                if (idx == std::string::npos) break;
+                auto j = idx + 1;
+                for (int depth = 1; depth != 0; ++j) {
+                    if (content[j] == '(') ++depth;
+                    else if (content[j] == ')') --depth;
+                }
+                content = content.substr(0, idx) + content.substr(j);
+            }
+        }
     }
 } // close namespace
